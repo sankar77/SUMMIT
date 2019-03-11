@@ -35,8 +35,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+//import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements Callback<String> {
+public class MainActivity extends AppCompatActivity {
 
     private CompoundButton autoFocus;
     private CompoundButton useFlash;
@@ -75,7 +76,8 @@ public class MainActivity extends AppCompatActivity implements Callback<String> 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == RC_OCR_CAPTURE) {
+        // String text = new String();
+        if (requestCode == RC_OCR_CAPTURE) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
                     String text = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
@@ -86,30 +88,64 @@ public class MainActivity extends AppCompatActivity implements Callback<String> 
                             .build();
 
                     RetroInterface retif = retrofit.create(RetroInterface.class);
-                    Call<String> userCall = retif.getSummary(text);
-                    userCall.enqueue(this);
+
+
+                        User u = new User("ABC","Software-Engineer");
+
+
+                        //JSONObject paramObject = new JSONObject();
+                        //paramObject.put("email", "sample@gmail.com");
+                        //paramObject.put("pass", "4384984938943");
+
+                       Call<String> userCall = retif.getUser();
+                        userCall.enqueue(new Callback<String>() {
+
+
+                                             @Override
+                                             public void onResponse(Call<String> call, Response<String> response) {
+                                               //  Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+                                                 Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                                                 int c = response.code();
+                                                 String us = (String) response.body();
+                                                 if(us== null){
+                                                     Toast.makeText(MainActivity.this, response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                                                     Toast.makeText(MainActivity.this, String.valueOf(c), Toast.LENGTH_SHORT).show();
+                                                 }
+                                                 if (response.isSuccessful() && us != null) {
+                                                     Toast.makeText(MainActivity.this, us, Toast.LENGTH_SHORT).show();
+                                                 }
+                                             }
+
+                                             @Override
+                                             public void onFailure(Call<String> call, Throwable t) {
+
+                                             }
+                                         });
+
+                            //Call<User> userCall = retif.createUser(text);
+                    //userCall.enqueue(this);
                     String file = "mfile.txt";
                     try {
                         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput(file, Context.MODE_PRIVATE));
                         outputStreamWriter.write(text);
                         Toast.makeText(this, "File write successful", Toast.LENGTH_LONG).show();
                         outputStreamWriter.close();
-                    }
-                    catch (IOException e) {
+                    } catch (IOException e) {
                         Log.e("Exception", "File write failed: " + e.toString());
                     }
+
                     String ret = "";
 
                     try {
                         InputStream inputStream = getApplicationContext().openFileInput(file);
 
-                        if ( inputStream != null ) {
+                        if (inputStream != null) {
                             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                             String receiveString = "";
                             StringBuilder stringBuilder = new StringBuilder();
 
-                            while ( (receiveString = bufferedReader.readLine()) != null ) {
+                            while ((receiveString = bufferedReader.readLine()) != null) {
                                 stringBuilder.append(receiveString);
                             }
 
@@ -119,11 +155,10 @@ public class MainActivity extends AppCompatActivity implements Callback<String> 
                             JSONArray arr = new JSONArray();
                             arr.put(ret);
 
-                            Toast.makeText(this, "JSON:"+arr.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "JSON:" + arr.toString(), Toast.LENGTH_LONG).show();
                             //Toast.makeText(this, "JSON-OBJ:"+obj.toString(), Toast.LENGTH_LONG).show();
                         }
-                    }
-                    catch (FileNotFoundException e) {
+                    } catch (FileNotFoundException e) {
                         Log.e("login activity", "File not found: " + e.toString());
                     } catch (IOException e) {
                         Log.e("login activity", "Can not read file: " + e.toString());
@@ -139,11 +174,11 @@ public class MainActivity extends AppCompatActivity implements Callback<String> 
                 statusMessage.setText(String.format(getString(R.string.ocr_error),
                         CommonStatusCodes.getStatusCodeString(resultCode)));
             }
-        }
-        else {
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -151,17 +186,27 @@ public class MainActivity extends AppCompatActivity implements Callback<String> 
         return true;
     }
 
+
+/*
     @Override
-    public void onResponse(Call<String> call, Response<String> response) {
+    public void onResponse(Call<User> call, Response<User> response) {
         Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, response.body(), Toast.LENGTH_SHORT).show();
+        User resusr = (User)response.body();
+        int c = response.code();
+        if(resusr == null){
+            Toast.makeText(this, response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, String.valueOf(c), Toast.LENGTH_SHORT).show();
+        }
+        if (response.isSuccessful() && resusr != null) {
+            Toast.makeText(this, resusr.toString(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
-    public void onFailure(Call<String> call, Throwable t) {
+    public void onFailure(Call<User> call, Throwable t) {
         Toast.makeText(this, "Failure", Toast.LENGTH_SHORT).show();
     }
-
+*/
 
     //@Override
    /* public boolean onOptionsItemSelected(MenuItem item) {
