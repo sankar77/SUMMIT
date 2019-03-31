@@ -17,6 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,8 +83,11 @@ public class MainActivity extends AppCompatActivity {
         // String text = new String();
         if (requestCode == RC_OCR_CAPTURE) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
+                Toast.makeText(this, "In", Toast.LENGTH_SHORT).show();
                 if (data != null) {
                     String text = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
+                    Toast.makeText(this, "In-1", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,"Text:" + text, Toast.LENGTH_SHORT).show();
                     Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(RetroInterface.ENDPOINT)
                             .addConverterFactory(ScalarsConverterFactory.create())
@@ -89,15 +96,39 @@ public class MainActivity extends AppCompatActivity {
 
                     RetroInterface retif = retrofit.create(RetroInterface.class);
 
+                        // shanky = thalaivar, he is the boss, here is a convo snippet
+                        // TAMU: hello
+                        // Thalivar: who dis?
 
-                        User u = new User("ABC","Software-Engineer");
+                        //User u = new User("ABC","Software-Engineer");
+                        String msg = text.replaceAll("\n+", "\\n");
+                        Summ1 s = new Summ1(msg,1);
+                        JSONArray jar = new JSONArray();
+                        JSONObject jso = new JSONObject();
+                        jar.put(s);
+                    try {
+                        jso.put("articles",jar);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(this, s.doc, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, String.valueOf(s.id), Toast.LENGTH_SHORT).show();
+                    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    //JsonParser jp = new JsonParser();
+                    try {
+                        Log.d("TAG",jso.toString(1));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    //Log.d("TAG",jso);
+                    //String prettyJsonString = gson.toJson(je);
 
 
                         //JSONObject paramObject = new JSONObject();
                         //paramObject.put("email", "sample@gmail.com");
                         //paramObject.put("pass", "4384984938943");
 
-                       Call<String> userCall = retif.getUser();
+                       Call<String> userCall = (Call<String>) retif.getSumm(jso.toString());
                         userCall.enqueue(new Callback<String>() {
 
 
@@ -109,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                                                  String us = (String) response.body();
                                                  if(us== null){
                                                      Toast.makeText(MainActivity.this, response.errorBody().toString(), Toast.LENGTH_SHORT).show();
-                                                     Toast.makeText(MainActivity.this, String.valueOf(c), Toast.LENGTH_SHORT).show();
+                                                     Toast.makeText(MainActivity.this, "Error code:" + String.valueOf(c), Toast.LENGTH_SHORT).show();
                                                  }
                                                  if (response.isSuccessful() && us != null) {
                                                      Toast.makeText(MainActivity.this, us, Toast.LENGTH_SHORT).show();
@@ -118,13 +149,14 @@ public class MainActivity extends AppCompatActivity {
 
                                              @Override
                                              public void onFailure(Call<String> call, Throwable t) {
-
+                                                 Toast.makeText(MainActivity.this, "Failure", Toast.LENGTH_SHORT).show();
                                              }
                                          });
 
+
                             //Call<User> userCall = retif.createUser(text);
                     //userCall.enqueue(this);
-                    String file = "mfile.txt";
+                  /* String file = "mfile.txt";
                     try {
                         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput(file, Context.MODE_PRIVATE));
                         outputStreamWriter.write(text);
@@ -164,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("login activity", "Can not read file: " + e.toString());
                     }
                     statusMessage.setText(R.string.ocr_success);
-
+                    */
                     Log.d(TAG, "Text read: " + text);
                 } else {
                     statusMessage.setText(R.string.ocr_failure);
