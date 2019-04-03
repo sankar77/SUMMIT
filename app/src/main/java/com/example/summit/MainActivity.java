@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
 
-        statusMessage = (TextView)findViewById(R.id.status_message);
+        statusMessage = findViewById(R.id.status_message);
         //    textValue = (EditText) findViewById(R.id.text_value);
 
         //  autoFocus = (CompoundButton) findViewById(R.id.auto_focus);
@@ -96,9 +96,6 @@ public class MainActivity extends AppCompatActivity {
 
                     RetroInterface retif = retrofit.create(RetroInterface.class);
 
-                        // shanky = thalaivar, he is the boss, here is a convo snippet
-                        // TAMU: hello
-                        // Thalivar: who dis?
 
                         //User u = new User("ABC","Software-Engineer");
                         String msg = text.replaceAll("\n+", "\\n");
